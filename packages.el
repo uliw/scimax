@@ -216,8 +216,6 @@
 (use-package pdf-tools)
 
 (use-package parsebib)
-(use-package helm)
-(use-package helm-bibtex)
 (use-package ivy-bibtex)
 (use-package citeproc)
 
