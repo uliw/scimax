@@ -232,7 +232,8 @@ and basically unreadable.
 We also add some font properties to click on goto-error.
 
 This should only apply to jupyter-lang blocks."
-  (when (string-match "^jupyter" (car (or (org-babel-get-src-block-info t) '(""))))
+  (when (or (string-match "^jupyter" (car (or (org-babel-get-src-block-info t) '(""))))
+	    (string-match "^ipython" (car (or (org-babel-get-src-block-info t) '("")))))
     (let* ((r (org-babel-where-is-src-block-result))
 	   (result (when r
 		     (save-excursion
