@@ -17,29 +17,31 @@
 ;; emacs -Q -batch -eval "(progn (require 'package) (package-initialize) (package-refresh-contents) (package-upgrade 'org))"
 ;; Built-in org is removed in bootstrap.el, and we install from GNU ELPA
 (use-package org
-  :ensure t)
-
-;; Use the current window for C-c ' source editing
-(setq org-src-window-setup 'current-window
-      org-support-shift-select t
-      ;; I like to press enter to follow a link. mouse clicks also work.
-      org-return-follows-link t)
-
-(global-set-key (kbd "C-c l") 'org-store-link)
-(global-set-key (kbd "C-c L") 'org-insert-link-global)
-(global-set-key (kbd "C-c o") 'org-open-at-point-global)
-(global-set-key (kbd "C-c c") 'org-capture)
-(global-set-key (kbd "M-<SPC>") 'org-mark-ring-goto)
-(global-set-key (kbd "H-.") 'org-time-stamp-inactive)
-
+  :ensure t
+  :init
+  (setq
+   ;; Use the current window for C-c ' source editing
+   org-src-window-setup 'current-window
+   org-support-shift-select t
+   ;; I like to press enter to follow a link. mouse clicks also work.
+   org-return-follows-link t)
+  :bind
+  (("C-c L" . org-insert-link-global)
+   ("C-c l" . org-store-link)
+   ("C-c o" . org-open-at-point-global)
+   ("C-c c" . org-capture)
+   ("M-<SPC>" . org-mark-ring-goto)
+   ("H-." . org-time-stamp-inactive)))
 
 ;; * Other packages
+;; Diminish minor modes that clutter the modeline
 (use-package diminish)
 
+;; Automatically keep code indented
 (use-package aggressive-indent
   :config (add-hook 'emacs-lisp-mode-hook #'aggressive-indent-mode))
 
-
+;; Easy navigation to visible text using avy
 (use-package avy)
 
 ;; May 24, 2017: this seems to be causing emacs 25.2 to be crashing on my linux box.
@@ -47,20 +49,19 @@
   (use-package tex
     :ensure auctex))
 
-
+;; Bookmark autosave every minute
 (use-package bookmark
   :init
   (setq bookmark-save-flag 1))
 
-
+;; Buttons in buffers
 (use-package button-lock)
 
 ;; Potential for commandline scripts using emacs
 (use-package commander
   :disabled t)
 
-(use-package drag-stuff)
-
+;; Enhanced minibuffer completion and narrowing framework
 (use-package swiper
   :bind
   ("H-s" . swiper-all)
@@ -68,15 +69,17 @@
   :config
   (ivy-mode)
   (define-key global-map [remap isearch-forward]
-    (if (executable-find "grep")
-	'counsel-grep-or-swiper
-      'swiper)))
+	      (if (executable-find "grep")
+		  'counsel-grep-or-swiper
+		'swiper)))
 
-(use-package multiple-cursors
-  :config
-  ;; mc/cmds-to-run-once is defined in `lispy'.
-  (add-to-list 'mc/cmds-to-run-once 'swiper-mc))
+;; Multiple cursors
+;; (use-package multiple-cursors
+;;   :config
+;;   ;; mc/cmds-to-run-once is defined in `lispy'.
+;;   (add-to-list 'mc/cmds-to-run-once 'swiper-mc))
 
+;; Various ivy/counsel enhancements
 (use-package counsel
   :init
   (require 'ivy)
@@ -114,18 +117,23 @@
   :config
   (counsel-mode))
 
+;; Ivy integration with avy
 (use-package ivy-avy)
 
+;; Projectile integration with counsel
 (use-package counsel-projectile)
 
 ;; Provides functions for working on lists
 (use-package dash)
 
+;; Emacs Dashboard - a nice start screen for Emacs
 (use-package dashboard)
 
-(use-package elfeed)
+;; Emacs RSS reader - I am not using this currently
+;; (use-package elfeed)
 
-(use-package esup)
+;; Emacs Start Up Profiler - seems broken with emacs 28+
+;; (use-package esup)
 
 ;; Provides functions for working with files
 (use-package f)
@@ -139,8 +147,10 @@
   (add-hook 'org-mode-hook #'flycheck-mode)
   (define-key flycheck-mode-map (kbd "s-;") 'flycheck-previous-error))
 
+;; Fuzzy matching for Emacs
 (use-package flx)
 
+;; Git commit message editing enhancements
 (use-package git-messenger
   :bind ("C-x v o" . git-messenger:popup-message))
 
@@ -152,8 +162,10 @@
 ;; Functions for working with hash tables
 (use-package ht)
 
+;; Exporting syntax highlighted code to HTML
 (use-package htmlize)
 
+;; Create and manage hydras - transient keymaps are slowly replacing these
 (use-package hydra
   :init
   (setq hydra-is-helpful t)
@@ -161,6 +173,7 @@
   :config
   (require 'hydra-ox))
 
+;; Ivy integration with hydra
 (use-package ivy-hydra)
 
 ;; Superior lisp editing
@@ -173,6 +186,7 @@
 		(lispy-mode)
 		(eldoc-mode)))))
 
+;; Git interface for Emacs
 (use-package magit
   :init
   (setq magit-completing-read-function 'ivy-completing-read)
@@ -184,6 +198,7 @@
    ("u" . magit-unstage)
    ("k" . magit-discard)))
 
+;; Move lines or regions up and down
 (use-package move-text
   :init (move-text-default-bindings))
 
@@ -191,50 +206,28 @@
 ;; https://github.com/Wilfred/mustache.el
 (use-package mustache)
 
-;; (when (executable-find "jupyter")
-;;   (use-package jupyter)
-;;   (use-package scimax-jupyter :load-path scimax-dir))
-
 (when (executable-find "jupyter")
-  (use-package jupyter :load-path (lambda () "/Users/jkitchin/Dropbox/emacs/emacs-jupyter"))
-  (use-package scimax-jupyter :load-path scimax-dir)
-  )
+  (use-package jupyter)
+  (use-package scimax-jupyter :load-path scimax-dir))
 
-(use-package org-db-v3
-  :load-path (lambda () "/Users/jkitchin/Dropbox/emacs/scimax/org-db-v3/elisp/")
-  :init
-  (setenv "ORG_DB_DB_PATH" "/Users/jkitchin/Dropbox/emacs/cache/org-db-v3/org-db-v3.db")
-  (setq org-db-v3-server-host "127.0.0.1"
-	org-db-v3-server-port 8765
-	org-db-v3-auto-start-server t)
-  :config
-  (global-set-key (kbd "H-v") 'org-db-menu)
-  (org-db-v3-start-server))
 
+;; Overlay library
 (use-package ov)
 
-(use-package pdf-tools)
+;; PDF viewer and annotator for Emacs - this probably gets loaded by org-ref
+;; (use-package pdf-tools)
 
+;; Packages for working with bibliographies
 (use-package parsebib)
+
+;; Ivy interface for managing and inserting bibtex citations
 (use-package ivy-bibtex)
+
+;; Citeproc for Emacs - CSL citation processor
 (use-package citeproc)
 
-;; (use-package org-ref
-;;   :init
-;;   (require 'bibtex)
-;;   (setq bibtex-autokey-year-length 4
-;; 	bibtex-autokey-name-year-separator "-"
-;; 	bibtex-autokey-year-title-separator "-"
-;; 	bibtex-autokey-titleword-separator "-"
-;; 	bibtex-autokey-titlewords 2
-;; 	bibtex-autokey-titlewords-stretch 1
-;; 	bibtex-autokey-titleword-length 5)
-;;   (define-key bibtex-mode-map (kbd "H-b") 'org-ref-bibtex-hydra/body)
-;;   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
-;;   (define-key org-mode-map (kbd "s-[") 'org-ref-insert-link-hydra/body))
-
+;; Org-ref - citations, cross-references and bibliographies in org-mode
 (use-package org-ref
-  :load-path (lambda () "/Users/jkitchin/Dropbox/emacs/org-ref/")
   :init
   (require 'bibtex)
   (setq bibtex-autokey-year-length 4
@@ -248,19 +241,21 @@
   (define-key org-mode-map (kbd "C-c ]") 'org-ref-insert-link)
   (define-key org-mode-map (kbd "s-[") 'org-ref-insert-link-hydra/body))
 
-
+;; Ivy interface for org-ref
 (use-package org-ref-ivy
-  :load-path (lambda () "/Users/jkitchin/Dropbox/emacs/org-ref/")
-  ;; :load-path (lambda () (file-name-directory (locate-library "org-ref")))
+  :load-path (lambda () (file-name-directory (locate-library "org-ref")))
   :init (setq org-ref-insert-link-function 'org-ref-insert-link-hydra/body
 	      org-ref-insert-cite-function 'org-ref-cite-insert-ivy
 	      org-ref-insert-label-function 'org-ref-insert-label-link
 	      org-ref-insert-ref-function 'org-ref-insert-ref-link
 	      org-ref-cite-onclick-function (lambda (_) (org-ref-citation-hydra/body))))
 
+;; Pandoc exporter for org-mode
 (use-package ox-pandoc)
 
+
 ;; https://github.com/bbatsov/projectile
+;; Project interaction library for Emacs
 (use-package projectile
   :bind
   ("C-c pp" . counsel-projectile-switch-project)
@@ -279,10 +274,13 @@
   (define-key projectile-mode-map (kbd "H-p") 'projectile-command-map)
   (projectile-global-mode))
 
+;; Python documentation lookup
 (use-package pydoc)
 
+;; Colorize color names in buffers
 (use-package rainbow-mode)
 
+;; Recent files management
 (use-package recentf
   :config
   (setq recentf-exclude
@@ -294,6 +292,7 @@
 ;; Functions for working with strings
 (use-package s)
 
+;; Smart mode line - a better modeline for Emacs
 (use-package smart-mode-line
   :config
   (setq sml/no-confirm-load-theme t)
@@ -303,6 +302,7 @@
 ;; keep recent commands available in M-x
 (use-package smex)
 
+;; Undo tree - visualize undo history
 (use-package undo-tree
   :diminish undo-tree-mode
   :config (global-undo-tree-mode))
@@ -311,14 +311,19 @@
 ;; are right after one you cannot add a space without getting a new line.
 (use-package ws-butler)
 
+;; Snippet expansion
 (use-package yasnippet)
 
+;; Ivy integration with yasnippet
 (use-package ivy-yasnippet
   :bind ("H-," . ivy-yasnippet))
 
 ;; * Treesitter
 
+;; Tree-sitter for Emacs - incremental parsing system for programming tools
 (use-package tree-sitter)
+
+;; Tree-sitter language definitions
 (use-package tree-sitter-langs
   :config
   (setq treesit-language-source-alist
@@ -335,17 +340,20 @@
           (bash-mode . bash-ts-mode))))
 
 ;; * Scimax packages
+;; Scimax - an Emacs environment for scientific programming and writing
 (use-package scimax
   :ensure nil
   :load-path scimax-dir
   :init (require 'scimax))
 
+;; Scimax major mode for enhanced org-mode experience
 (use-package scimax-mode
   :ensure nil
   :load-path scimax-dir
   :init (require 'scimax-mode)
   :config (scimax-mode))
 
+;; Scimax org-mode extensions
 (use-package scimax-org
   :ensure nil
   :load-path scimax-dir
@@ -365,14 +373,17 @@
   :init
   (require 'scimax-org))
 
+;; Org export to clipboard in various formats
 (use-package ox-clip
-  :ensure nil
+  :ensure t
   :bind ("H-k" . ox-clip-formatted-copy))
 
+;; Scimax email integration
 (use-package scimax-email
   :ensure nil
   :load-path scimax-dir)
 
+;; Scimax Projectile integration
 (use-package scimax-projectile
   :ensure nil
   :load-path scimax-dir)
@@ -393,25 +404,31 @@
     :ensure nil
     :load-path scimax-dir))
 
+;; Load the scimax notebook system
 (org-babel-load-file (expand-file-name "scimax-notebook.org" scimax-dir))
 
+;; Various scimax utilities
 (use-package scimax-utils
   :ensure nil
   :load-path scimax-dir
   :bind ( "<f9>" . hotspots))
 
+;; Bibtex hotkeys for easier editing of bibtex files
 (use-package bibtex-hotkeys
   :ensure nil
   :load-path scimax-dir)
 
+;; Org export for manuscripts
 (use-package ox-manuscript
   :ensure nil
   :load-path (lambda () (expand-file-name "ox-manuscript" scimax-dir)))
 
+;; Org-show for displaying images and other content inline
 (use-package org-show
   :ensure nil
   :load-path (lambda () (expand-file-name "org-show" scimax-dir)))
 
+;; Word utilities and hydra
 (use-package words
   :ensure nil
   :load-path scimax-dir
@@ -422,39 +439,47 @@
   :load-path scimax-dir
   :bind ("H-o" . ore))
 
+;; Scimax ivy enhancements
 (use-package scimax-ivy
   :ensure nil
   :load-path scimax-dir)
 
+;; Scimax yasnippet extensions
 (use-package scimax-yas
   :ensure nil
   :load-path scimax-dir)
 
+;; Autoformatting abbreviations
 (use-package scimax-autoformat-abbrev
   :ensure nil
   :load-path scimax-dir)
 
+;; Hydras for scimax
 (use-package scimax-hydra
   :ensure nil
   :load-path scimax-dir
   :bind ("<f12>" . scimax/body))
 
+;; Journal management in scimax
 (use-package scimax-journal
   :ensure nil
   :load-path scimax-dir)
 
+;; Scimax applications
 (use-package scimax-apps
   :ensure nil
   :load-path scimax-dir)
 
+;; Scimax org-babel extensions
 (use-package scimax-ob
   :ensure nil
   :load-path scimax-dir)
 
+;; Scimax editmarks
 (let ((enable-local-variables nil))
   (org-babel-load-file (expand-file-name "scimax-editmarks.org" scimax-dir)))
 
-
+;; Add scimax info files to the info path
 (add-to-list 'Info-directory-list scimax-dir)
 
 ;; * The end

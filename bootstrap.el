@@ -37,6 +37,7 @@
   (package-install 'use-package))
 
 (eval-when-compile
+  (setq use-package-compute-statistics t)
   (require 'use-package)
   (when (and  (boundp 'scimax-package-refresh) scimax-package-refresh)
     (package-refresh-contents)))
