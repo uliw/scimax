@@ -326,25 +326,29 @@
 ;; Tree-sitter language definitions
 (use-package tree-sitter-langs
   :config
-  (setq treesit-language-source-alist
-	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
-          (python "https://github.com/tree-sitter/tree-sitter-python")
-          (json "https://github.com/tree-sitter/tree-sitter-json")
-          (html "https://github.com/tree-sitter/tree-sitter-html")
-	  (css "https://github.com/tree-sitter/tree-sitter-css"))
-	major-mode-remap-alist
-	'((python-mode . python-ts-mode)
-          (json-mode . json-ts-mode)
-          (css-mode . css-ts-mode)
-	  (html-mode . html-ts-mode)
-          (bash-mode . bash-ts-mode))))
+  ;;;  as of emacs 31, this should no longer be necessary, ansd the 
+  ;; (setq treesit-language-source-alist
+  ;; 	'((bash "https://github.com/tree-sitter/tree-sitter-bash")
+  ;;         (python "https://github.com/tree-sitter/tree-sitter-python")
+  ;;         (json "https://github.com/tree-sitter/tree-sitter-json")
+  ;;         (html "https://github.com/tree-sitter/tree-sitter-html")
+  ;; 	  (css "https://github.com/tree-sitter/tree-sitter-css"))
+  ;; 	major-mode-remap-alist
+  ;; 	'((python-mode . python-ts-mode)
+  ;;         (json-mode . json-ts-mode)
+  ;;         (css-mode . css-ts-mode)
+  ;; 	  (html-mode . html-ts-mode)
+  ;;         (bash-mode . bash-ts-mode))
+  ;; 	)
+  )
+  
 
-;; * Scimax packages
-;; Scimax - an Emacs environment for scientific programming and writing
-(use-package scimax
-  :ensure nil
-  :load-path scimax-dir
-  :init (require 'scimax))
+  ;; * Scimax packages
+  ;; Scimax - an Emacs environment for scientific programming and writing
+  (use-package scimax
+    :ensure nil
+    :load-path scimax-dir
+    :init (require 'scimax))
 
 ;; Scimax major mode for enhanced org-mode experience
 (use-package scimax-mode
